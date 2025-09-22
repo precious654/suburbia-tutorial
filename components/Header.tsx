@@ -1,0 +1,44 @@
+import React from "react";
+import Link from "next/link";
+import { createClient } from "@/prismicio";
+import { PrismicNextLink } from "@prismicio/next";
+
+import { ButtonLink } from "./ButtonLink";
+import { Logo } from "./Logo";
+
+export async function Header() {
+  const client = await createClient();
+  const settings = await client.getSingle("settings");
+
+  return (
+    <header className="header absolute top-0 left-0 right-0 z-50 ~h-32/48 ~py-4/6 ~px-4/6 md:h-32">
+      <div className="mx-auto grid grid-cols-[auto_auto] w-full max-w-6xl items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
+        <Link href="/" className="justify-self-start">
+          <Logo className="text-brand-purple ~h-12/20" />
+        </Link>
+
+        <nav
+          aria-label="Main"
+          className="col-span-full row-start-2 md:col-span-1 md:col-start-2 md:row-start-1"
+        >
+          <ul className="flex flex-wrap items-center justify-center gap-8">
+            {settings.data.navigation.map((item) => (
+              <li key={item.link.text}>
+                <PrismicNextLink field={item.link} className="~text-lg/xl">
+                  {item.link.text}
+                </PrismicNextLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="justify-self-end">
+          <ButtonLink href="" icon="cart" color="purple" aria-label="Cart (1)">
+            <span className="md:hidden">(1)</span>
+            <span className="hidden md:inline">Cart (1)</span>
+          </ButtonLink>
+        </div>
+      </div>
+    </header>
+  );
+}
