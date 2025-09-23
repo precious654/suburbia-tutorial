@@ -46,10 +46,10 @@
                     {
                       "id": "skateboard",
                       "fields": [
-                        "name",
-                        "image",
+                        "customizer_link",
                         "price",
-                        "customizer_link"
+                        "image",
+                        "name"
                       ]
                     }
                   ]

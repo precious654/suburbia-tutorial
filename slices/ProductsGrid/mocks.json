@@ -34,8 +34,8 @@
 							[
 								"skateboard",
 								{
+									"key": "22993c5b-661b-4279-a224-391695934991",
 									"__TYPE__": "LinkContent",
-									"key": "7328fd69-2d6a-46c7-a2b9-25821b7b28cd",
 									"value": {
 										"__TYPE__": "DocumentLink",
 										"id": "mock_document_id"

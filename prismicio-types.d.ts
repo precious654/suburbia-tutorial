@@ -368,7 +368,7 @@ export interface ProductsGridSliceDefaultPrimaryProductItem {
     [
       {
         id: "skateboard";
-        fields: ["name", "image", "price", "customizer_link"];
+        fields: ["customizer_link", "price", "image", "name"];
       },
     ]
   >;
