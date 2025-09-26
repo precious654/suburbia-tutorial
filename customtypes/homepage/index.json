@@ -11,6 +11,9 @@
         "fieldset": "Slice Zone",
         "config": {
           "choices": {
+            "text_and_image": {
+              "type": "SharedSlice"
+            },
             "products_grid": {
               "type": "SharedSlice"
             },
