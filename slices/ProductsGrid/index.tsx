@@ -6,6 +6,7 @@ import { PrismicText, PrismicRichText } from "@prismicio/react";
 import { Bounded } from "@/components/Bounded";
 import { Heading } from "@/components/Heading";
 import { SkateboardProduct } from "./SkateboardProduct";
+import { SlideIn } from "@/components/SlideIn";
 
 /**
  * Props for `ProductsGrid`.
@@ -22,12 +23,16 @@ const ProductsGrid: FC<ProductsGridProps> = ({ slice }) => {
       data-slice-variation={slice.variation}
       className="bg-brand-gray bg-texture"
     >
-      <Heading className="text-center ~mb-4/6" as="h2">
-        <PrismicText field={slice.primary.heading} />
-      </Heading>
-      <div className="text-center ~mb-6/10">
-        <PrismicRichText field={slice.primary.body} />
-      </div>
+      <SlideIn>
+        <Heading className="text-center ~mb-4/6" as="h2">
+          <PrismicText field={slice.primary.heading} />
+        </Heading>
+      </SlideIn>
+      <SlideIn delay={.02}>
+        <div className="text-center ~mb-6/10">
+          <PrismicRichText field={slice.primary.body} />
+        </div>
+      </SlideIn>
       <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {slice.primary.product.map(
           ({ skateboard }) =>

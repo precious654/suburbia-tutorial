@@ -7,7 +7,7 @@ import { ButtonLink } from "./ButtonLink";
 import { Logo } from "./Logo";
 
 export async function Header() {
-  const client = await createClient();
+  const client = createClient();
   const settings = await client.getSingle("settings");
 
   return (

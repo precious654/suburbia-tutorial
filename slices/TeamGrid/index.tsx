@@ -8,6 +8,7 @@ import React from "react";
 import { Bounded } from "@/components/Bounded";
 import { Heading } from "@/components/Heading";
 import { Skater } from "./Skater";
+import { SlideIn } from "@/components/SlideIn";
 
 /**
  * Props for `TeamGrid`.
@@ -27,21 +28,21 @@ const TeamGrid: FC<TeamGridProps> = async ({ slice }) => {
       data-slice-variation={slice.variation}
       className="bg-brand-navy bg-texture"
     >
-      <Heading as="h2" size="lg" className="text-center text-white">
-        <PrismicText field={slice.primary.heading}/>
-      </Heading>
+      <SlideIn>
+        <Heading as="h2" size="lg" className="text-center text-white">
+          <PrismicText field={slice.primary.heading} />
+        </Heading>
+      </SlideIn>
       <div className="grid grid-cols-1 gap-8 md:grid-cols-4 mt-10">
-        {
-          skaters.map((skater, index) => (
-            <React.Fragment key={index}>
-              {
-                skater.data.firstname && (
-                  <Skater skater={skater} index={index} />
-                )
-              }
-            </React.Fragment>
-          ))
-        }
+        {skaters.map((skater, index) => (
+          <React.Fragment key={index}>
+            {skater.data.firstname && (
+              <SlideIn>
+                <Skater skater={skater} index={index} />
+              </SlideIn>
+            )}
+          </React.Fragment>
+        ))}
       </div>
       {/**
        * 💡 Use Prismic MCP with your code editor
