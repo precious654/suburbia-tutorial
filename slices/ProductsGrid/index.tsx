@@ -28,7 +28,7 @@ const ProductsGrid: FC<ProductsGridProps> = ({ slice }) => {
           <PrismicText field={slice.primary.heading} />
         </Heading>
       </SlideIn>
-      <SlideIn delay={.02}>
+      <SlideIn>
         <div className="text-center ~mb-6/10">
           <PrismicRichText field={slice.primary.body} />
         </div>
