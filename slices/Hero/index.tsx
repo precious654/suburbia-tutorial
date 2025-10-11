@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Content } from "@prismicio/client";
+import { asImageSrc, Content } from "@prismicio/client";
 import {
   PrismicRichText,
   PrismicText,
@@ -13,6 +13,11 @@ import { TallLogo } from "./TallLogo";
 import { WideLogo } from "./WideLogo";
 import { InteractiveSkateboard } from "./InteractiveSkateboard";
 
+const DEFAULT_DECK_TEXTURE = "/skateboard/Deck.webp";
+const DEFAULT_WHEEL_TEXTURE = "/skateboard/SkateWheel1.png";
+const DEFAULT_TRUCK_COLOR = "#6F6E6A";
+const DEFAULT_BOLT_COLOR = "#6F6E6A";
+
 /**
  * Props for `Hero`.
  */
@@ -22,6 +27,13 @@ export type HeroProps = SliceComponentProps<Content.HeroSlice>;
  * Component for "Hero" Slices.
  */
 const Hero: FC<HeroProps> = ({ slice }) => {
+  const deckTextureURL =
+    asImageSrc(slice.primary.skateboard_deck_texture) || DEFAULT_DECK_TEXTURE;
+  const wheelTextureURL =
+    asImageSrc(slice.primary.skateboard_wheel_texture) || DEFAULT_WHEEL_TEXTURE;
+  const truckColor = slice.primary.skateboard_truck_color || DEFAULT_TRUCK_COLOR;
+  const boltColor = slice.primary.skateboard_bolt_color || DEFAULT_BOLT_COLOR;
+
   return (
     <Bounded
       data-slice-type={slice.slice_type}
@@ -41,12 +53,22 @@ const Hero: FC<HeroProps> = ({ slice }) => {
           <div className="max-w-[45ch] font-semibold ~text-lg/xl">
             <PrismicRichText field={slice.primary.body} />
           </div>
-          <ButtonLink field={slice.primary.button} icon="skateboard" size="lg" className="z-20 mt-2 block">
+          <ButtonLink
+            field={slice.primary.button}
+            icon="skateboard"
+            size="lg"
+            className="z-20 mt-2 block"
+          >
             {slice.primary.button.text}
           </ButtonLink>
         </div>
       </div>
-      <InteractiveSkateboard />
+      <InteractiveSkateboard
+        deckTextureURL={deckTextureURL}
+        wheelTextureURL={wheelTextureURL}
+        truckColor={truckColor}
+        boltColor={boltColor}
+      />
     </Bounded>
   );
 };

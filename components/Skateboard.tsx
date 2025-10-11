@@ -6,8 +6,18 @@ import * as THREE from "three";
 import React, { useRef } from "react";
 import { useGLTF, useTexture } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
+import { useFrame } from "@react-three/fiber";
+import gsap from "gsap";
 
-type SkateboardProps = {};
+type SkateboardProps = {
+  wheelTextureURLs: string[];
+  wheelTextureURL: string;
+  deckTextureURLs: string[];
+  deckTextureURL: string;
+  truckColor: string;
+  boltColor: string;
+  constantWheelSpin?: boolean;
+};
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -25,8 +35,40 @@ type GLTFResult = GLTF & {
   materials: {};
 };
 
-export function Skateboard(props: SkateboardProps) {
+export function Skateboard({
+  wheelTextureURLs,
+  wheelTextureURL,
+  deckTextureURLs,
+  deckTextureURL,
+  boltColor,
+  truckColor,
+  constantWheelSpin = false,
+}: SkateboardProps) {
+  const wheelRefs = useRef<THREE.Object3D[]>([]);
+
   const { nodes } = useGLTF("/skateboard.gltf") as GLTFResult;
+
+  // Wheel Texture
+  const wheelTextures = useTexture(wheelTextureURLs);
+  wheelTextures.forEach((texture) => {
+    texture.flipY = false;
+    texture.colorSpace = THREE.SRGBColorSpace;
+  });
+  const wheelTextureIndex = wheelTextureURLs.findIndex(
+    (url) => url === wheelTextureURL
+  );
+  const wheelTexture = wheelTextures[wheelTextureIndex];
+
+  // Deck Texture
+  const deckTextures = useTexture(deckTextureURLs);
+  deckTextures.forEach((texture) => {
+    texture.flipY = false;
+    texture.colorSpace = THREE.SRGBColorSpace;
+  });
+  const deckTextureIndex = deckTextureURLs.findIndex(
+    (url) => url === deckTextureURL
+  );
+  const deckTexture = deckTextures[deckTextureIndex];
 
   const gripTapeDiffuse = useTexture("/skateboard/griptape-diffuse.webp");
   const gripTapeRoughness = useTexture("/skateboard/griptape-roughness.webp");
@@ -58,8 +100,6 @@ export function Skateboard(props: SkateboardProps) {
     return material;
   }, [gripTapeDiffuse, gripTapeRoughness]);
 
-  const boltColor = "#555555";
-
   const boltMaterial = React.useMemo(
     () =>
       new THREE.MeshStandardMaterial({
@@ -74,15 +114,13 @@ export function Skateboard(props: SkateboardProps) {
   metalNormal.wrapS = THREE.RepeatWrapping;
   metalNormal.wrapT = THREE.RepeatWrapping;
   metalNormal.anisotropy = 8;
-  metalNormal.repeat.set(8,8);
-
-  const truckColor = "#555555";
+  metalNormal.repeat.set(8, 8);
 
   const truckMaterial = React.useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-		normalMap: metalNormal,
-		normalScale: new THREE.Vector2(0.3, 0.3),
+        normalMap: metalNormal,
+        normalScale: new THREE.Vector2(0.3, 0.3),
         color: truckColor,
         metalness: 0.8,
         roughness: 0.25,
@@ -90,32 +128,56 @@ export function Skateboard(props: SkateboardProps) {
     [metalNormal, truckColor]
   );
 
-  const deckTexture = useTexture("/skateboard/Deck.webp");
   deckTexture.flipY = false;
 
   const deckMaterial = React.useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-		map: deckTexture,
+        map: deckTexture,
         roughness: 0.1,
       }),
     [deckTexture]
   );
 
-  const wheelTexture = useTexture("/skateboard/SkateWheel1.png");
   wheelTexture.flipY = false;
 
   const wheelMaterial = React.useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-		map: wheelTexture,
+        map: wheelTexture,
         roughness: 0.35,
       }),
     [wheelTexture]
   );
 
+  // Add Wheel Refs
+  const addToWheelRefs = (ref: THREE.Object3D | null) => {
+    if (ref && !wheelRefs.current.includes(ref)) {
+      wheelRefs.current.push(ref);
+    }
+  };
+
+  useFrame(() => {
+    if (!wheelRefs.current || !constantWheelSpin) return;
+    for (const wheel of wheelRefs.current) {
+      wheel.rotation.x += 2;
+    }
+  });
+
+  React.useEffect(() => {
+    if (!wheelRefs.current || constantWheelSpin) return;
+    for (const wheel of wheelRefs.current) {
+      // GSAP
+      gsap.to(wheel.rotation, {
+        x: "-=30",
+        duration: 2.5,
+        ease: "circ.out",
+      })
+    }
+  }, [constantWheelSpin, wheelTextureURL])
+
   return (
-    <group {...props} dispose={null}>
+    <group dispose={null}>
       <group name="Scene">
         <mesh
           name="GripTape"
@@ -132,6 +194,7 @@ export function Skateboard(props: SkateboardProps) {
           geometry={nodes.Wheel1.geometry}
           material={wheelMaterial}
           position={[0.238, 0.086, 0.635]}
+          ref={addToWheelRefs}
         />
         <mesh
           name="Wheel2"
@@ -140,6 +203,27 @@ export function Skateboard(props: SkateboardProps) {
           geometry={nodes.Wheel2.geometry}
           material={wheelMaterial}
           position={[-0.237, 0.086, 0.635]}
+          ref={addToWheelRefs}
+        />
+        <mesh
+          name="Wheel3"
+          castShadow
+          receiveShadow
+          geometry={nodes.Wheel3.geometry}
+          material={wheelMaterial}
+          position={[0.237, 0.086, -0.635]}
+          rotation={[Math.PI, 0, Math.PI]}
+          ref={addToWheelRefs}
+        />
+        <mesh
+          name="Wheel4"
+          castShadow
+          receiveShadow
+          geometry={nodes.Wheel4.geometry}
+          material={wheelMaterial}
+          position={[-0.238, 0.086, -0.635]}
+          rotation={[Math.PI, 0, Math.PI]}
+          ref={addToWheelRefs}
         />
         <mesh
           name="Deck"
@@ -150,30 +234,12 @@ export function Skateboard(props: SkateboardProps) {
           position={[0, 0.271, -0.002]}
         />
         <mesh
-          name="Wheel4"
-          castShadow
-          receiveShadow
-          geometry={nodes.Wheel4.geometry}
-          material={wheelMaterial}
-          position={[-0.238, 0.086, -0.635]}
-          rotation={[Math.PI, 0, Math.PI]}
-        />
-        <mesh
           name="Bolts"
           castShadow
           receiveShadow
           geometry={nodes.Bolts.geometry}
           material={boltMaterial}
           position={[0, 0.198, 0]}
-          rotation={[Math.PI, 0, Math.PI]}
-        />
-        <mesh
-          name="Wheel3"
-          castShadow
-          receiveShadow
-          geometry={nodes.Wheel3.geometry}
-          material={wheelMaterial}
-          position={[0.237, 0.086, -0.635]}
           rotation={[Math.PI, 0, Math.PI]}
         />
         <mesh
