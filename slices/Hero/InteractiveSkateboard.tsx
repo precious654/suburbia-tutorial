@@ -4,7 +4,6 @@ import React from "react";
 import * as THREE from "three";
 import { Canvas, ThreeEvent, useThree } from "@react-three/fiber";
 import {
-  OrbitControls,
   Environment,
   ContactShadows,
   Html,

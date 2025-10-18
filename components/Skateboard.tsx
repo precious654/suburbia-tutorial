@@ -17,6 +17,7 @@ type SkateboardProps = {
   truckColor: string;
   boltColor: string;
   constantWheelSpin?: boolean;
+  pose?: "upright" | "side";
 };
 
 type GLTFResult = GLTF & {
@@ -43,6 +44,7 @@ export function Skateboard({
   boltColor,
   truckColor,
   constantWheelSpin = false,
+  pose = "upright",
 }: SkateboardProps) {
   const wheelRefs = useRef<THREE.Object3D[]>([]);
 
@@ -172,12 +174,28 @@ export function Skateboard({
         x: "-=30",
         duration: 2.5,
         ease: "circ.out",
-      })
+      });
     }
-  }, [constantWheelSpin, wheelTextureURL])
+  }, [constantWheelSpin, wheelTextureURL]);
 
+  const positions = React.useMemo(() => {
+    return {
+      upright: {
+        position: [0, 0, 0],
+        rotation: [0, 0, 0],
+      },
+      side: {
+        position: [0, 0.295, 0],
+        rotation: [0, 0, Math.PI / 2],
+      },
+    } as const;
+  }, []);
   return (
-    <group dispose={null}>
+    <group
+      dispose={null}
+      rotation={positions[pose].rotation}
+      position={positions[pose].position}
+    >
       <group name="Scene">
         <mesh
           name="GripTape"
