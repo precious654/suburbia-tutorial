@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Bowlby_One_SC, DM_Mono } from "next/font/google";
 
 import "./globals.css";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { SVGFilters } from "@/components/SVGFilters";
 import { createClient } from "@/prismicio";
 
