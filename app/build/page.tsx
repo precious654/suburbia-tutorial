@@ -1,29 +1,46 @@
 import React from "react";
 import Link from "next/link";
 import { createClient } from "@/prismicio";
+import { asImageSrc } from "@prismicio/client";
 
 import { Logo } from "@/components/Logo";
 import { Heading } from "@/components/Heading";
 import { ButtonLink } from "@/components/ButtonLink";
 import { CustomizerControlsProvider } from "./context";
 import { Preview } from "./Preview";
-import { asImageSrc } from "@prismicio/client";
+import { Controls } from "./Controls";
+import Loading from "./Loading";
 
-export default async function page() {
+type searchParams = {
+  wheel?: string;
+  deck?: string;
+  truck?: string;
+  bolt?: string;
+};
+
+export default async function page(props: {
+  searchParams: Promise<searchParams>;
+}) {
+  const searchParams = await props.searchParams;
+
   const client = createClient();
   const customizerSettings = await client.getSingle("board_customizer");
   const { wheels, decks, metals } = customizerSettings.data;
 
-  const defaultWheel = wheels[0];
-  const defaultDeck = decks[0];
-  const defaultTruck = metals[0];
-  const defaultBolt = metals[0];
+  const defaultWheel =
+    wheels.find((wheel) => wheel.uid === searchParams.wheel) ?? wheels[0];
+  const defaultDeck =
+    decks.find((deck) => deck.uid === searchParams.deck) ?? decks[0];
+  const defaultTruck =
+    metals.find((metal) => metal.uid === searchParams.truck) ?? metals[0];
+  const defaultBolt =
+    metals.find((metal) => metal.uid === searchParams.bolt) ?? metals[0];
 
   const wheelTextureURLs = wheels
     .map((texture) => asImageSrc(texture.texture))
     .filter((url): url is string => Boolean(url));
 
-	const deckTextureURLs = decks
+  const deckTextureURLs = decks
     .map((texture) => asImageSrc(texture.texture))
     .filter((url): url is string => Boolean(url));
 
@@ -37,7 +54,10 @@ export default async function page() {
       >
         <div className="relative aspect-square shrink-0 bg-[#3A414A] lg:aspect-auto lg:grow">
           <div className="absolute inset-0">
-            <Preview wheelTextureURLs={wheelTextureURLs} deckTextureURLs={deckTextureURLs} />
+            <Preview
+              wheelTextureURLs={wheelTextureURLs}
+              deckTextureURLs={deckTextureURLs}
+            />
           </div>
           <Link href="/" className="absolute top-6 left-6">
             <Logo className="h-16 text-white" />
@@ -47,11 +67,13 @@ export default async function page() {
           <Heading size="sm" as="h1" className="mb-6 mt-0">
             Build your board
           </Heading>
+          <Controls wheels={wheels} decks={decks} metals={metals} />
           <ButtonLink href="" color="lime" icon="plus">
             Add to cart
           </ButtonLink>
         </div>
       </CustomizerControlsProvider>
+      <Loading />
     </div>
   );
 }
